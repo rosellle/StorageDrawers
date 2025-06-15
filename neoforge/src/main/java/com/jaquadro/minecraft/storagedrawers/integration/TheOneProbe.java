@@ -1,9 +1,8 @@
-/*
-package com.jaquadro.minecraft.storagedrawers.integration;
+/*package com.jaquadro.minecraft.storagedrawers.integration;
 
 import com.jaquadro.minecraft.storagedrawers.StorageDrawers;
 import com.jaquadro.minecraft.storagedrawers.block.tile.BlockEntityDrawers;
-import com.jaquadro.minecraft.storagedrawers.config.ClientConfig;
+import com.jaquadro.minecraft.storagedrawers.config.ModClientConfig;
 import com.jaquadro.minecraft.storagedrawers.util.WorldUtils;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.network.chat.Component;
@@ -15,11 +14,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.function.Function;
 
 public class TheOneProbe implements Function<ITheOneProbe, Void> {
+    private static final TheOneProbe INSTANCE = new TheOneProbe();
+
+    public static TheOneProbe getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public Void apply(ITheOneProbe probe) {
-        if (ClientConfig.INTEGRATION.enableTheOneProbe.get())
-            probe.registerProvider(new DrawerProbeProvider());
+        if (ModClientConfig.INSTANCE.isLoaded() && !ModClientConfig.INSTANCE.INTEGRATION.enableTheOneProbe.get())
+            return null;
 
+        probe.registerProvider(new DrawerProbeProvider());
         return null;
     }
 
@@ -34,11 +40,10 @@ public class TheOneProbe implements Function<ITheOneProbe, Void> {
             BlockEntityDrawers blockEntityDrawers = WorldUtils.getBlockEntity(world, data.getPos(), BlockEntityDrawers.class);
             if (blockEntityDrawers != null) {
                 DrawerOverlay overlay = new DrawerOverlay();
-                for (Component component : overlay.getOverlay(blockEntityDrawers)) {
+                for (Component component : overlay.getOverlay(blockEntityDrawers, true)) {
                     probe.text(component);
                 }
             }
         }
     }
-}
-*/
+}*/

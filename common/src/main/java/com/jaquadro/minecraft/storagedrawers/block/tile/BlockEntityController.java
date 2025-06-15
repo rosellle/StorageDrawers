@@ -212,27 +212,56 @@ public class BlockEntityController extends BaseBlockEntity implements IDrawerGro
     public List<INetworked> getBoundRemoteNodes () {
         return controllerHostData.getRemoteNodes().toList();
     }
+
+    @Override
+    public void validateRemoteNode (INetworked node) {
+        if (ModCommonConfig.INSTANCE.GENERAL.debugTrace.get())
+            ModServices.log.info("Controller [{}] validating node [{}]", worldPosition, node);
+
+        controllerHostData.validateRemoteNode(this, node);
+    }
+
     @Override
     public void invalidateRemoteNode (INetworked node) {
+        if (ModCommonConfig.INSTANCE.GENERAL.debugTrace.get())
+            ModServices.log.info("Controller [{}] invalidating node [{}]", worldPosition, node);
+
         controllerHostData.removeRemoteNode(this, node);
     }
     @Override
     public boolean addRemoteNode (INetworked node) {
+        if (ModCommonConfig.INSTANCE.GENERAL.debugTrace.get())
+            ModServices.log.info("Controller [{}] add remote node [{}]", worldPosition, node);
+
         return controllerHostData.addRemoteNode(this, node);
     }
     @Override
     public void setRemoved () {
+        if (ModCommonConfig.INSTANCE.GENERAL.debugTrace.get())
+            ModServices.log.info("controller [{}] setRemoved", worldPosition);
+
         super.setRemoved();
+        if (getLevel() == null || getLevel().isClientSide)
+            return;
+
         for (var node : getBoundRemoteNodes()) {
-            invalidateRemoteNode(node);
-            node.unbindControlGroup();
+            if (node instanceof BlockEntity blockEntity) {
+                BlockPos pos = blockEntity.getBlockPos();
+                getLevel().scheduleTick(pos, blockEntity.getBlockState().getBlock(), 1);
+            }
+
+            //invalidateRemoteNode(node);
+            //node.unbindControlGroup();
         }
     }
 
     @Override
     public void clearRemoved () {
+        if (ModCommonConfig.INSTANCE.GENERAL.debugTrace.get())
+            ModServices.log.info("controller [{}] clearRemoved", worldPosition);
+
         super.clearRemoved();
-        if (getLevel() == null)
+        if (getLevel() == null || getLevel().isClientSide)
             return;
 
         if (!getLevel().getBlockTicks().hasScheduledTick(getBlockPos(), getBlockState().getBlock()))
@@ -644,7 +673,8 @@ public class BlockEntityController extends BaseBlockEntity implements IDrawerGro
         searchQueue.clear();
         searchDiscovered.clear();
 
-        controllerHostData.validateRemoteNodes(this, level);
+        if (!getLevel().isClientSide)
+            controllerHostData.validateRemoteNodes(this, level);
 
         populateRoot(getBlockPos(), true);
 
@@ -706,7 +736,7 @@ public class BlockEntityController extends BaseBlockEntity implements IDrawerGro
         }
     }
 
-    protected IDrawerGroup getGroupForDrawerSlot (int drawerSlot) {
+    public IDrawerGroup getGroupForDrawerSlot (int drawerSlot) {
         if (drawerSlot < 0 || drawerSlot >= drawerSlotList.size())
             return null;
 

@@ -1,3 +1,11 @@
+[15.0.2]
+- Fixed possible server hang during chunk saving when remote upgrades in use
+- Fixed GUI names for drawers displaying as "Framing Table"
+- Fixed framing table consuming contents of drawers (conrib by sharpedmimishee)
+- Added Spanish (es_es) translation (contrib by vatusai)
+- Added Chinese Simplified (zh_cn) translation (contrib by suoyuki, CTidy, zizunsi)
+- FABRIC: Fix void upgrade ignored when interacting with controllers (contrib by Pikachyuu)
+
 [15.0.1]
 - Fixed framed item rendering issue
 - NEOFORGE: Fixed crash from item rendering issue
