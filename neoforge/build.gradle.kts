@@ -5,7 +5,7 @@ import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
 plugins {
     id("modloader-conv")
-    id("net.neoforged.moddev") version ("2.0.107")
+    id("net.neoforged.moddev") version ("2.0.146")
     id("com.modrinth.minotaur")
 }
 

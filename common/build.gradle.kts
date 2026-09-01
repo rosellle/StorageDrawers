@@ -3,16 +3,15 @@ import com.texelsaurus.Properties
 
 plugins {
     id("java-conv")
-    id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
+    id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
 }
 
-minecraft {
-    version(Versions.minecraft)
-    accessWideners(file("src/main/resources/${Properties.modid}.accesswidener"))
+loom {
+    accessWidenerPath = file("src/main/resources/${Properties.modid}.accesswidener")
 }
 
 dependencies {
-    compileOnly("org.spongepowered:mixin:0.8.5")
+    minecraft("com.mojang:minecraft:${Versions.minecraft}")
 }
 
 configurations {

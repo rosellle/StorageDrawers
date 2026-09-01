@@ -5,17 +5,16 @@ import net.darkhax.curseforgegradle.Constants as CFG_Constants
 
 plugins {
     id("modloader-conv")
-    id("fabric-loom") version "1.11.7"
+    id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
     id("com.modrinth.minotaur")
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:${Versions.minecraft}")
-    mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:${Versions.fabricLoader}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${Versions.fabric}")
+    implementation("net.fabricmc:fabric-loader:${Versions.fabricLoader}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${Versions.fabric}")
 
-    modCompileOnly("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:21.9.6")
+    compileOnly("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:26.1.5")
 
     //modCompileOnlyApi("mezz.jei:jei-${Versions.minecraft}-fabric-api:19.8.2.99")
     //modRuntimeOnly("mezz.jei:jei-${Versions.minecraft}-fabric:19.8.2.99")
@@ -36,13 +35,13 @@ loom {
     }
 }
 
-tasks.create<TaskPublishCurseForge>("publishCurseForge") {
-    dependsOn(tasks.remapJar)
+tasks.register<TaskPublishCurseForge>("publishCurseForge") {
+    dependsOn(tasks.jar)
 
     disableVersionDetection()
     apiToken = System.getenv("CURSEFORGE_API_KEY") ?: "debug_key"
 
-    val mainFile = upload(Properties.curseProjectId, tasks.remapJar.get().archiveFile)
+    val mainFile = upload(Properties.curseProjectId, tasks.jar.get().archiveFile)
     mainFile.displayName = "${Properties.name}-${Versions.minecraft}-fabric-$version"
     mainFile.changelogType = "markdown"
     mainFile.changelog = File(rootDir, "CHANGELOG.last.md").readText()
@@ -61,7 +60,7 @@ modrinth {
     versionNumber.set("${Versions.minecraft}-${Versions.mod}")
     versionType.set(Properties.distRelease)
     gameVersions.set(Properties.distGameVersions.split(','))
-    uploadFile.set(tasks.remapJar.get())
+    uploadFile.set(tasks.jar.get())
     loaders.add("fabric")
 
     dependencies {
@@ -69,4 +68,3 @@ modrinth {
         optional.project("forge-config-api-port")
     }
 }
-tasks.modrinth.get().dependsOn(tasks.remapJar)

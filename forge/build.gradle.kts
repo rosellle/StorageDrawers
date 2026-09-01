@@ -5,8 +5,7 @@ import net.darkhax.curseforgegradle.Constants as CFG_Constants
 
 plugins {
     id("modloader-conv")
-    id("net.minecraftforge.gradle") version ("[6.0.36,6.2)")
-    id("org.spongepowered.mixin") version ("0.7-SNAPSHOT")
+    id("net.minecraftforge.gradle") version ("[7.0.17,8)")
     id("com.modrinth.minotaur")
 }
 
@@ -18,14 +17,11 @@ mixin {
 
 minecraft {
     mappings("official", Versions.minecraft)
-    reobf = false
-    accessTransformer("src/main/resources/META-INF/accesstransformer.cfg");
+    accessTransformers = files("src/main/resources/META-INF/accesstransformer.cfg");
     runs {
+
         create("client") {
-            taskName("runClient")
-            workingDirectory(project.file("run"))
-            ideaModule("${rootProject.name}.${project.name}.main")
-            //args("-mixin.config=${Properties.modid}.mixins.json")
+            workingDir = project.file("run")
             mods {
                 create(Properties.modid) {
                     source(sourceSets.main.get())
@@ -34,11 +30,8 @@ minecraft {
         }
 
         create("server") {
-            taskName("runServer")
-            workingDirectory(project.file("run"))
-            ideaModule("${rootProject.name}.${project.name}.main")
+            workingDir = project.file("run")
             args("--nogui")
-            //args("-mixin.config=${Properties.modid}.mixins.json")
             mods {
                 create(Properties.modid) {
                     source(sourceSets.main.get())
@@ -48,10 +41,18 @@ minecraft {
     }
 }
 
+repositories {
+    minecraft.mavenizer(this)
+    maven(fg.forgeMaven)
+    maven(fg.minecraftLibsMaven)
+    mavenCentral()
+}
+
 dependencies {
-    "minecraft"("net.minecraftforge:forge:${Versions.minecraft}-${Versions.forge}")
-    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
-    // annotationProcessor("net.minecraftforge:eventbus-validator:7.0-beta.7")
+    // Forge
+    implementation(minecraft.dependency("net.minecraftforge:forge:${Versions.minecraft}-${Versions.forge}"))
+    annotationProcessor("net.minecraftforge:eventbus-validator:7.0.1")
+
     implementation("net.sf.jopt-simple:jopt-simple:5.0.4") { version { strictly("5.0.4") } }
 
     // JEI
